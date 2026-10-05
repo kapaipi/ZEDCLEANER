@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZEDCLEANER — Get the job done.</title>
+  <meta name="description" content="ZEDCLEANER is a service marketplace for Zambia. Post a job, receive proposals, hire the right person." />
+
+  <!-- The ONLY stylesheet in the project -->
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <!-- ========== NAVBAR ========== -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="brand">ZED<span>CLEANER</span></a>
+      <nav class="nav-links">
+        <a href="#how">How it works</a>
+        <a href="#categories">Categories</a>
+        <a href="auth.html" class="btn btn-primary btn-sm">Log in / Sign up</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ========== HERO ========== -->
+  <section class="section">
+    <div class="container center">
+      <h1 style="font-size: 40px; max-width: 720px; margin: 0 auto var(--sp-3);">
+        Find trusted service providers across Zambia.
+      </h1>
+      <p class="muted" style="font-size: 18px; max-width: 600px; margin: 0 auto var(--sp-5);">
+        Post a job. Receive proposals. Hire the right person.<br />
+        <strong style="color: var(--blue-600);">Get the job done.</strong>
+      </p>
+      <div class="flex" style="justify-content: center; flex-wrap: wrap;">
+        <a href="auth.html" class="btn btn-primary">Post a job</a>
+        <a href="auth.html" class="btn btn-outline">Find work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section id="how" class="section" style="background: var(--white); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);">
+    <div class="container">
+      <h2 class="center mb-4">How it works</h2>
+
+      <div class="grid grid-2">
+
+        <!-- Customer flow -->
+        <div class="card">
+          <h3>For customers</h3>
+          <p class="muted small">Hire someone in three steps.</p>
+          <ol style="padding-left: var(--sp-5); color: var(--ink-700);">
+            <li class="mb-2"><strong>Post your job.</strong> Describe what you need, where, and your budget.</li>
+            <li class="mb-2"><strong>Receive proposals.</strong> Providers send you their price and a short message.</li>
+            <li><strong>Hire the best one.</strong> Accept a proposal — the job is theirs.</li>
+          </ol>
+        </div>
+
+        <!-- Provider flow -->
+        <div class="card">
+          <h3>For providers</h3>
+          <p class="muted small">Find work in three steps.</p>
+          <ol style="padding-left: var(--sp-5); color: var(--ink-700);">
+            <li class="mb-2"><strong>Browse open jobs.</strong> Filter by category that matches your skills.</li>
+            <li class="mb-2"><strong>Send a proposal.</strong> Set your price and a short message to the customer.</li>
+            <li><strong>Get hired.</strong> If the customer accepts, you see the job on your dashboard.</li>
+          </ol>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CATEGORIES ========== -->
+  <section id="categories" class="section">
+    <div class="container">
+      <h2 class="center">Services on ZEDCLEANER</h2>
+      <p class="center muted mb-4">Every kind of job. One marketplace.</p>
+
+      <div class="grid grid-3">
+        <div class="card center"><strong>Cleaning</strong></div>
+        <div class="card center"><strong>Electrical</strong></div>
+        <div class="card center"><strong>Plumbing</strong></div>
+        <div class="card center"><strong>Solar installation</strong></div>
+        <div class="card center"><strong>Construction</strong></div>
+        <div class="card center"><strong>Painting</strong></div>
+        <div class="card center"><strong>Transport</strong></div>
+        <div class="card center"><strong>Tutoring</strong></div>
+        <div class="card center"><strong>Technology</strong></div>
+        <div class="card center"><strong>Graphic design</strong></div>
+        <div class="card center"><strong>Moving services</strong></div>
+        <div class="card center"><strong>Gardening</strong></div>
+        <div class="card center"><strong>General services</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA ========== -->
+  <section class="section">
+    <div class="container">
+      <div class="card center" style="background: var(--blue-50); border-color: var(--blue-100); padding: var(--sp-7) var(--sp-5);">
+        <h2>Ready to get started?</h2>
+        <p class="muted mb-4">Create a free account in under a minute.</p>
+        <a href="auth.html" class="btn btn-primary">Create account</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container flex-between flex-wrap">
+      <div><strong>ZEDCLEANER</strong> — Get the job done.</div>
+      <div class="small">© <span id="year"></span> ZEDCLEANER. Zambia.</div>
+    </div>
+  </footer>
+
+  <!-- Tiny inline script — sets the year in the footer.
+       This is the ONLY JS on this page, and it's harmless. -->
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
