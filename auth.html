@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in or Sign up — ZEDCLEANER</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+
+      <div class="auth-logo">ZED<span>CLEANER</span></div>
+      <div class="auth-tagline">Get the job done.</div>
+
+      <div class="tabs">
+        <button type="button" id="tab-login"  class="tab active">Log in</button>
+        <button type="button" id="tab-signup" class="tab">Sign up</button>
+      </div>
+
+      <!-- LOGIN PANEL -->
+      <div id="panel-login">
+        <div id="login-alert" class="alert" style="display:none;"></div>
+
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="login-email">Email</label>
+            <input id="login-email" class="input" type="email" autocomplete="email" required />
+          </div>
+
+          <div class="field">
+            <label for="login-password">Password</label>
+            <input id="login-password" class="input" type="password" autocomplete="current-password" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Log in</button>
+
+          <p class="center small muted mt-4">
+            Don't have an account?
+            <a href="#" id="goto-signup">Sign up</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- SIGNUP PANEL -->
+      <div id="panel-signup" style="display:none;">
+        <div id="signup-alert" class="alert" style="display:none;"></div>
+
+        <form id="signup-form" novalidate>
+          <div class="field">
+            <label>I want to…</label>
+            <div class="role-picker">
+              <div class="role-option selected" data-role="customer">
+                Hire someone
+                <div class="small muted">Post jobs</div>
+              </div>
+              <div class="role-option" data-role="provider">
+                Find work
+                <div class="small muted">Send proposals</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="signup-name">Full name</label>
+            <input id="signup-name" class="input" type="text" autocomplete="name" required />
+          </div>
+
+          <div class="field">
+            <label for="signup-email">Email</label>
+            <input id="signup-email" class="input" type="email" autocomplete="email" required />
+          </div>
+
+          <div class="field">
+            <label for="signup-password">Password</label>
+            <input id="signup-password" class="input" type="password" autocomplete="new-password" required />
+            <div class="field-hint">At least 6 characters.</div>
+          </div>
+
+          <div class="field">
+            <label for="signup-confirm">Confirm password</label>
+            <input id="signup-confirm" class="input" type="password" autocomplete="new-password" required />
+          </div>
+
+          <!-- Provider-only fields -->
+          <div id="provider-extra" style="display:none;">
+            <div class="field">
+              <label for="signup-phone">Phone number</label>
+              <input id="signup-phone" class="input" type="tel" placeholder="e.g. 097 123 4567" />
+            </div>
+
+            <div class="field">
+              <label for="signup-location">Location</label>
+              <input id="signup-location" class="input" type="text" placeholder="e.g. Lusaka" />
+            </div>
+
+            <div class="field">
+              <label for="signup-skills">Skills / services</label>
+              <select id="signup-skills" class="select" multiple size="5"></select>
+              <div class="field-hint">Hold Ctrl (or Cmd) to pick more than one.</div>
+            </div>
+
+            <div class="field">
+              <label for="signup-experience">Experience</label>
+              <input id="signup-experience" class="input" type="text" placeholder="e.g. 5 years" />
+            </div>
+
+            <div class="field">
+              <label for="signup-bio">Short bio</label>
+              <textarea id="signup-bio" class="textarea" placeholder="Tell customers about your work…"></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Create account</button>
+
+          <p class="center small muted mt-4">
+            Already have an account?
+            <a href="#" id="goto-login">Log in</a>
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script type="module" src="assets/js/auth.js"></script>
+
+  <script>
+    document.getElementById("goto-signup").addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("tab-signup").click();
+    });
+    document.getElementById("goto-login").addEventListener("click", (e) => {
+      e.preventDefault();
+      document.getElementById("tab-login").click();
+    });
+  </script>
+
+</body>
+</html>
