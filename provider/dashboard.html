@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Provider Dashboard — ZEDCLEANER</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar filled by JS -->
+  <div id="navbar-slot"></div>
+
+  <main class="page">
+    <div class="container">
+
+      <!-- ========== HEADER ========== -->
+      <div class="page-header">
+        <div>
+          <h1 id="welcome-heading" class="page-title">Welcome</h1>
+          <p class="page-subtitle">Browse open jobs and send proposals.</p>
+        </div>
+      </div>
+
+      <!-- ========== STATS ========== -->
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-label">Open jobs</div>
+          <div id="stat-open-jobs" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">My proposals</div>
+          <div id="stat-my-proposals" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Pending</div>
+          <div id="stat-pending" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Hired</div>
+          <div id="stat-hired" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <!-- ========== MARKETPLACE ========== -->
+      <h2 class="mt-4">Open jobs</h2>
+
+      <div class="toolbar mt-4">
+        <input id="search-input" class="input" type="text" placeholder="Search jobs…" />
+        <select id="filter-category" class="select">
+          <option value="">All categories</option>
+          <!-- Options injected by provider.js -->
+        </select>
+      </div>
+
+      <div id="job-list" class="job-list"></div>
+
+      <!-- ========== MY PROPOSALS ========== -->
+      <h2 class="mt-6">My proposals</h2>
+      <div id="my-proposals-list" class="mt-4"></div>
+
+      <!-- ========== HIRED JOBS ========== -->
+      <h2 class="mt-6">Jobs won</h2>
+      <div id="hired-jobs-list" class="mt-4"></div>
+
+    </div>
+  </main>
+
+  <!-- ========== PROPOSAL MODAL ========== -->
+  <div id="modal-wrap" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
+      <div class="card-header">
+        <h2 id="modal-title" class="card-title">Job</h2>
+        <button id="modal-close" class="btn btn-ghost btn-sm" type="button">Close</button>
+      </div>
+
+      <div id="modal-job-details" class="mb-4"></div>
+
+      <hr style="border:none; border-top:1px solid var(--line); margin: var(--sp-4) 0;" />
+
+      <div id="proposal-alert" class="alert" style="display:none;"></div>
+
+      <form id="proposal-form" novalidate>
+        <div class="field">
+          <label for="proposal-price">Your price</label>
+          <input id="proposal-price" class="input" type="text" placeholder="e.g. K450" required />
+        </div>
+
+        <div class="field">
+          <label for="proposal-message">Message to customer</label>
+          <textarea id="proposal-message" class="textarea" placeholder="Explain what you'll do and why you're the right person…"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Send proposal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Page logic. type="module" is required for import/export. -->
+  <script type="module" src="../assets/js/provider.js"></script>
+
+</body>
+</html>
