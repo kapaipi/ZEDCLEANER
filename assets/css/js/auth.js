@@ -17,9 +17,9 @@ import {
   bootstrap,
   ROLES,
   CATEGORIES,
-} from "../core/engine.js";
+} from "../../core/engine.js";
 
-import { setSession, getCurrentUser } from "../core/session.js";
+import { setSession, getCurrentUser } from "../../core/session.js";
 
 // ---------- Make sure admin exists ----------
 bootstrap();
