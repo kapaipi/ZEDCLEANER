@@ -60,7 +60,6 @@
             <label for="job-category">Category</label>
             <select id="job-category" class="select" required>
               <option value="">Choose a category…</option>
-              <!-- Options injected by customer.js -->
             </select>
           </div>
 
@@ -90,6 +89,17 @@
 
     </div>
   </main>
+
+  <!-- ========== PROPOSALS MODAL ========== -->
+  <div id="modal-wrap" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:620px; width:100%; max-height:90vh; overflow-y:auto;">
+      <div class="card-header">
+        <h2 id="modal-title" class="card-title">Proposals</h2>
+        <button id="modal-close" class="btn btn-ghost btn-sm" type="button">Close</button>
+      </div>
+      <div id="modal-job-body"></div>
+    </div>
+  </div>
 
   <!-- Page logic. type="module" is required for import/export. -->
   <script type="module" src="../assets/js/customer.js"></script>
