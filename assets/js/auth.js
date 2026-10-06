@@ -1,9 +1,6 @@
 // ============================================================
 // ZEDCLEANER — assets/js/auth.js
-// ------------------------------------------------------------
 // Page logic for auth.html.
-// Handles: tab switching, role picker, signup, login,
-//          error display, redirect to correct dashboard.
 // ============================================================
 
 import {
@@ -16,32 +13,25 @@ import {
 
 import { setSession, getCurrentUser } from "../../core/session.js";
 
-// ---------- Make sure admin exists ----------
 bootstrap();
 
-// ---------- Redirect if already logged in ----------
 const existing = getCurrentUser();
 if (existing) {
   window.location.href = dashboardPathFor(existing.role);
 }
 
-// ---------- Grab DOM elements ----------
 const tabLogin      = document.getElementById("tab-login");
 const tabSignup     = document.getElementById("tab-signup");
 const panelLogin    = document.getElementById("panel-login");
 const panelSignup   = document.getElementById("panel-signup");
-
 const loginForm     = document.getElementById("login-form");
 const signupForm    = document.getElementById("signup-form");
-
 const loginAlert    = document.getElementById("login-alert");
 const signupAlert   = document.getElementById("signup-alert");
-
 const roleOptions   = document.querySelectorAll(".role-option");
 const providerExtra = document.getElementById("provider-extra");
 const skillsSelect  = document.getElementById("signup-skills");
 
-// ---------- Populate skills dropdown with categories ----------
 if (skillsSelect) {
   CATEGORIES.forEach((cat) => {
     const opt = document.createElement("option");
@@ -51,7 +41,6 @@ if (skillsSelect) {
   });
 }
 
-// ---------- Tab switching ----------
 function showTab(which) {
   const isLogin = which === "login";
   tabLogin.classList.toggle("active", isLogin);
@@ -65,7 +54,6 @@ tabLogin.addEventListener("click",  () => showTab("login"));
 tabSignup.addEventListener("click", () => showTab("signup"));
 showTab("login");
 
-// ---------- Role picker ----------
 let selectedRole = ROLES.CUSTOMER;
 roleOptions.forEach((el) => {
   el.addEventListener("click", () => {
@@ -79,7 +67,6 @@ roleOptions.forEach((el) => {
   });
 });
 
-// ---------- Alerts ----------
 function showAlert(el, message, type = "error") {
   if (!el) return;
   el.textContent = message;
@@ -92,7 +79,6 @@ function clearAlert(el) {
   el.style.display = "none";
 }
 
-// ---------- Signup ----------
 signupForm.addEventListener("submit", (e) => {
   e.preventDefault();
   clearAlert(signupAlert);
@@ -143,7 +129,6 @@ signupForm.addEventListener("submit", (e) => {
   }, 500);
 });
 
-// ---------- Login ----------
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   clearAlert(loginAlert);
@@ -167,7 +152,6 @@ loginForm.addEventListener("submit", (e) => {
   }, 400);
 });
 
-// ---------- Role → dashboard path ----------
 function dashboardPathFor(role) {
   if (role === ROLES.CUSTOMER) return "customer/dashboard.html";
   if (role === ROLES.PROVIDER) return "provider/dashboard.html";
