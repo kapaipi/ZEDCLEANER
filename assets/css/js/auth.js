@@ -1,14 +1,9 @@
 // ============================================================
 // ZEDCLEANER — assets/js/auth.js
 // ------------------------------------------------------------
-// PURPOSE:
-//   Page logic for auth.html.
-//   Handles: tab switching, role picker, signup, login,
-//            error display, redirect to correct dashboard.
-//
-// CONNECTS TO:
-//   Imports:  core/engine.js, core/session.js
-//   Loaded by: auth.html  (<script type="module" src="...">)
+// Page logic for auth.html.
+// Handles: tab switching, role picker, signup, login,
+//          error display, redirect to correct dashboard.
 // ============================================================
 
 import {
@@ -68,20 +63,15 @@ function showTab(which) {
 }
 tabLogin.addEventListener("click",  () => showTab("login"));
 tabSignup.addEventListener("click", () => showTab("signup"));
-
-// Default tab = login
 showTab("login");
 
 // ---------- Role picker ----------
 let selectedRole = ROLES.CUSTOMER;
-
 roleOptions.forEach((el) => {
   el.addEventListener("click", () => {
     roleOptions.forEach((o) => o.classList.remove("selected"));
     el.classList.add("selected");
     selectedRole = el.dataset.role;
-
-    // Show extra provider fields only for providers
     if (providerExtra) {
       providerExtra.style.display =
         selectedRole === ROLES.PROVIDER ? "block" : "none";
@@ -122,7 +112,6 @@ signupForm.addEventListener("submit", (e) => {
     return showAlert(signupAlert, "Passwords do not match.");
   }
 
-  // Provider extras
   let phone = "", location = "", experience = "", bio = "", skills = [];
   if (selectedRole === ROLES.PROVIDER) {
     phone      = document.getElementById("signup-phone")?.value.trim()    || "";
@@ -147,7 +136,6 @@ signupForm.addEventListener("submit", (e) => {
     return showAlert(signupAlert, result.error);
   }
 
-  // Log them in immediately
   setSession(result.user);
   showAlert(signupAlert, "Account created! Redirecting…", "success");
   setTimeout(() => {
@@ -180,7 +168,6 @@ loginForm.addEventListener("submit", (e) => {
 });
 
 // ---------- Role → dashboard path ----------
-// auth.html lives at the top level, so paths do NOT need "../".
 function dashboardPathFor(role) {
   if (role === ROLES.CUSTOMER) return "customer/dashboard.html";
   if (role === ROLES.PROVIDER) return "provider/dashboard.html";
