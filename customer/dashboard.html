@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Dashboard — ZEDCLEANER</title>
+  <link rel="stylesheet" href="../assets/css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar filled by JS -->
+  <div id="navbar-slot"></div>
+
+  <main class="page">
+    <div class="container">
+
+      <!-- ========== HEADER ========== -->
+      <div class="page-header">
+        <div>
+          <h1 id="welcome-heading" class="page-title">Welcome</h1>
+          <p class="page-subtitle">Post jobs and manage your requests.</p>
+        </div>
+        <button id="btn-new-job" type="button" class="btn btn-primary">Post a new job</button>
+      </div>
+
+      <!-- ========== STATS ========== -->
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-label">Total jobs</div>
+          <div id="stat-total" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Open</div>
+          <div id="stat-open" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Hired</div>
+          <div id="stat-hired" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Proposals</div>
+          <div id="stat-proposals" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <!-- ========== JOB FORM ========== -->
+      <div id="job-form-wrap" class="card" style="display:none;">
+        <h2>Post a new job</h2>
+
+        <div id="job-alert" class="alert" style="display:none;"></div>
+
+        <form id="job-form" novalidate>
+
+          <div class="field">
+            <label for="job-title">Title</label>
+            <input id="job-title" class="input" type="text" placeholder="e.g. Fix leaking kitchen tap" required />
+          </div>
+
+          <div class="field">
+            <label for="job-category">Category</label>
+            <select id="job-category" class="select" required>
+              <option value="">Choose a category…</option>
+              <!-- Options injected by customer.js -->
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="job-description">Description</label>
+            <textarea id="job-description" class="textarea" placeholder="Describe the job in detail…" required></textarea>
+          </div>
+
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="job-location">Location</label>
+              <input id="job-location" class="input" type="text" placeholder="e.g. Lusaka" />
+            </div>
+            <div class="field">
+              <label for="job-budget">Budget</label>
+              <input id="job-budget" class="input" type="text" placeholder="e.g. K500" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Post job</button>
+        </form>
+      </div>
+
+      <!-- ========== JOB LIST ========== -->
+      <h2 class="mt-6">Your jobs</h2>
+      <div id="job-list" class="job-list mt-4"></div>
+
+    </div>
+  </main>
+
+  <!-- Page logic. type="module" is required for import/export. -->
+  <script type="module" src="../assets/js/customer.js"></script>
+
+</body>
+</html>
