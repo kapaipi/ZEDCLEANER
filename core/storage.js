@@ -1,77 +1,88 @@
 // ============================================================
 // ZEDCLEANER — core/storage.js
-// ------------------------------------------------------------
-// PURPOSE:
-//   The ONLY file in the entire project that talks to localStorage.
-//   Everything else (engine.js, session.js) goes through these
-//   three functions. This means if we ever replace localStorage
-//   with a real server API, we only edit THIS file.
-//
-// CONNECTS TO:
-//   - Imported by: core/engine.js, core/session.js
-//   - Imports:     nothing (this is the foundation)
-//
-// STORAGE KEYS USED ELSEWHERE (defined in engine.js / session.js):
-//   zedcleaner_users
-//   zedcleaner_jobs
-//   zedcleaner_proposals
-//   zedcleaner_session
+// All Firestore read/write operations live here.
+// Everything else in the app goes through these functions.
 // ============================================================
 
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+import { db } from "./firebase.js";
 
 /**
- * Save any JS value (object, array, string, number) to localStorage.
- * Automatically converts it to a JSON string.
- *
- * @param {string} key   - The storage key, e.g. "zedcleaner_jobs"
- * @param {*}      data  - Anything you want to store
+ * Add a new document to a collection with an auto-generated ID.
+ * Returns the full object including its new `id`.
  */
-export function saveData(key, data) {
+export async function addDocTo(collectionName, data) {
   try {
-    const jsonString = JSON.stringify(data);
-    localStorage.setItem(key, jsonString);
-    return true;
+    const ref = await addDoc(collection(db, collectionName), data);
+    return { ok: true, data: { id: ref.id, ...data } };
   } catch (error) {
-    console.error(`[storage] Failed to save "${key}":`, error);
-    return false;
+    console.error(`[storage] addDocTo("${collectionName}") failed:`, error);
+    return { ok: false, error: error.message };
   }
 }
 
-
 /**
- * Load a value from localStorage.
- * If the key does not exist (or is corrupted), returns `fallback`.
- *
- * @param {string} key       - The storage key
- * @param {*}      fallback  - What to return if nothing is stored
- *                             (usually [] for lists, {} for objects)
- * @returns {*}              - The stored value, or the fallback
+ * Get ALL documents in a collection.
+ * Returns an array of { id, ...fields }.
  */
-export function loadData(key, fallback = null) {
+export async function getAllDocs(collectionName) {
   try {
-    const jsonString = localStorage.getItem(key);
-    if (jsonString === null) {
-      return fallback;
-    }
-    return JSON.parse(jsonString);
+    const snapshot = await getDocs(collection(db, collectionName));
+    return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (error) {
-    console.error(`[storage] Failed to load "${key}" (returning fallback):`, error);
-    return fallback;
+    console.error(`[storage] getAllDocs("${collectionName}") failed:`, error);
+    return [];
   }
 }
 
+/**
+ * Get one document by ID. Returns the object or null.
+ */
+export async function getDocById(collectionName, id) {
+  try {
+    const ref = doc(db, collectionName, id);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() };
+  } catch (error) {
+    console.error(`[storage] getDocById("${collectionName}", "${id}") failed:`, error);
+    return null;
+  }
+}
 
 /**
- * Permanently remove a key from localStorage.
- *
- * @param {string} key - The storage key to delete
+ * Update specific fields on a document.
+ * Returns { ok: true } on success.
  */
-export function removeData(key) {
+export async function updateDocById(collectionName, id, updates) {
   try {
-    localStorage.removeItem(key);
-    return true;
+    const ref = doc(db, collectionName, id);
+    await updateDoc(ref, updates);
+    return { ok: true };
   } catch (error) {
-    console.error(`[storage] Failed to remove "${key}":`, error);
-    return false;
+    console.error(`[storage] updateDocById("${collectionName}", "${id}") failed:`, error);
+    return { ok: false, error: error.message };
+  }
+}
+
+/**
+ * Delete a document by ID.
+ */
+export async function deleteDocById(collectionName, id) {
+  try {
+    await deleteDoc(doc(db, collectionName, id));
+    return { ok: true };
+  } catch (error) {
+    console.error(`[storage] deleteDocById("${collectionName}", "${id}") failed:`, error);
+    return { ok: false, error: error.message };
   }
 }
