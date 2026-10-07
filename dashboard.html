@@ -110,6 +110,13 @@
               </div>
             </div>
 
+            <div class="field">
+              <label for="job-images">Photos (optional — up to 5)</label>
+              <input id="job-images" class="input" type="file" accept="image/*" multiple />
+              <div class="field-hint">Add pictures so providers can see the job clearly.</div>
+              <div id="image-preview" style="display:flex; gap:6px; flex-wrap:wrap; margin-top:var(--sp-3);"></div>
+            </div>
+
             <button type="submit" class="btn btn-primary">Post job</button>
           </form>
         </div>
@@ -129,7 +136,7 @@
   </main>
 
   <!-- ============================================================
-       PROPOSAL MODAL (send a proposal to a marketplace job)
+       PROPOSAL MODAL
        ============================================================ -->
   <div id="prop-modal-wrap" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:16px; z-index:999;">
     <div class="card" style="max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
@@ -161,7 +168,7 @@
   </div>
 
   <!-- ============================================================
-       VIEW PROPOSALS MODAL (for your own job — accept/reject)
+       VIEW PROPOSALS MODAL
        ============================================================ -->
   <div id="view-modal-wrap" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:16px; z-index:999;">
     <div class="card" style="max-width:620px; width:100%; max-height:90vh; overflow-y:auto;">
