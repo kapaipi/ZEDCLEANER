@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — ZEDCLEANER</title>
+  <link rel="stylesheet" href="assets/css/style.css" />
+</head>
+<body>
+
+  <!-- Navbar filled by JS -->
+  <div id="navbar-slot"></div>
+
+  <main class="page">
+    <div class="container">
+
+      <!-- ========== HEADER ========== -->
+      <div class="page-header">
+        <div>
+          <h1 id="welcome-heading" class="page-title">Welcome</h1>
+          <p class="page-subtitle">Post jobs, find work, manage everything in one place.</p>
+        </div>
+      </div>
+
+      <!-- ========== STATS ========== -->
+      <div class="stat-row">
+        <div class="stat">
+          <div class="stat-label">Open jobs</div>
+          <div id="stat-open-jobs" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">My jobs posted</div>
+          <div id="stat-my-jobs" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Proposals sent</div>
+          <div id="stat-my-proposals" class="stat-value">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Jobs won</div>
+          <div id="stat-won" class="stat-value">0</div>
+        </div>
+      </div>
+
+      <!-- ========== TABS ========== -->
+      <div class="tabs" style="margin-top: var(--sp-5);">
+        <button type="button" id="tab-market"      class="tab active">Marketplace</button>
+        <button type="button" id="tab-myjobs"      class="tab">My Jobs</button>
+        <button type="button" id="tab-myproposals" class="tab">My Proposals</button>
+      </div>
+
+      <!-- ============================================================
+           MARKETPLACE PANEL
+           ============================================================ -->
+      <div id="panel-market">
+
+        <div class="toolbar mt-4">
+          <input id="search-input" class="input" type="text" placeholder="Search jobs…" />
+          <select id="filter-category" class="select">
+            <option value="">All categories</option>
+          </select>
+        </div>
+
+        <div id="marketplace-list" class="job-list mt-4"></div>
+      </div>
+
+      <!-- ============================================================
+           MY JOBS PANEL
+           ============================================================ -->
+      <div id="panel-myjobs" style="display:none;">
+
+        <div class="flex-between mt-4 mb-4">
+          <p class="muted small" style="margin:0;">Jobs you have posted. Accept proposals to hire.</p>
+          <button id="btn-new-job" type="button" class="btn btn-primary">Post a new job</button>
+        </div>
+
+        <!-- Job form -->
+        <div id="job-form-wrap" class="card" style="display:none;">
+          <h2>Post a new job</h2>
+
+          <div id="job-alert" class="alert" style="display:none;"></div>
+
+          <form id="job-form" novalidate>
+
+            <div class="field">
+              <label for="job-title">Title</label>
+              <input id="job-title" class="input" type="text" placeholder="e.g. Fix leaking kitchen tap" required />
+            </div>
+
+            <div class="field">
+              <label for="job-category">Category</label>
+              <select id="job-category" class="select" required>
+                <option value="">Choose a category…</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="job-description">Description</label>
+              <textarea id="job-description" class="textarea" placeholder="Describe the job in detail…" required></textarea>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="field">
+                <label for="job-location">Location</label>
+                <input id="job-location" class="input" type="text" placeholder="e.g. Lusaka" />
+              </div>
+              <div class="field">
+                <label for="job-budget">Budget</label>
+                <input id="job-budget" class="input" type="text" placeholder="e.g. K500" />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Post job</button>
+          </form>
+        </div>
+
+        <div id="my-jobs-list" class="job-list mt-4"></div>
+      </div>
+
+      <!-- ============================================================
+           MY PROPOSALS PANEL
+           ============================================================ -->
+      <div id="panel-myproposals" style="display:none;">
+        <p class="muted small mt-4">Proposals you have sent to other people's jobs.</p>
+        <div id="my-proposals-list" class="mt-4"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ============================================================
+       PROPOSAL MODAL (send a proposal to a marketplace job)
+       ============================================================ -->
+  <div id="prop-modal-wrap" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:560px; width:100%; max-height:90vh; overflow-y:auto;">
+      <div class="card-header">
+        <h2 id="prop-modal-title" class="card-title">Job</h2>
+        <button id="prop-modal-close" class="btn btn-ghost btn-sm" type="button">Close</button>
+      </div>
+
+      <div id="prop-job-body" class="mb-4"></div>
+
+      <hr style="border:none; border-top:1px solid var(--line); margin: var(--sp-4) 0;" />
+
+      <div id="proposal-alert" class="alert" style="display:none;"></div>
+
+      <form id="proposal-form" novalidate>
+        <div class="field">
+          <label for="proposal-price">Your price</label>
+          <input id="proposal-price" class="input" type="text" placeholder="e.g. K450" required />
+        </div>
+
+        <div class="field">
+          <label for="proposal-message">Message to customer</label>
+          <textarea id="proposal-message" class="textarea" placeholder="Explain what you'll do and why you're the right person…"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Send proposal</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       VIEW PROPOSALS MODAL (for your own job — accept/reject)
+       ============================================================ -->
+  <div id="view-modal-wrap" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.55); align-items:center; justify-content:center; padding:16px; z-index:999;">
+    <div class="card" style="max-width:620px; width:100%; max-height:90vh; overflow-y:auto;">
+      <div class="card-header">
+        <h2 id="view-modal-title" class="card-title">Proposals</h2>
+        <button id="view-modal-close" class="btn btn-ghost btn-sm" type="button">Close</button>
+      </div>
+      <div id="view-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Page logic -->
+  <script type="module" src="assets/js/dashboard.js"></script>
+
+</body>
+</html>
