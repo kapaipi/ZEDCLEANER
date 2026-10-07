@@ -19,8 +19,9 @@
         <button type="button" id="tab-signup" class="tab">Sign up</button>
       </div>
 
-      <!-- LOGIN PANEL -->
+      <!-- ================= LOGIN ================= -->
       <div id="panel-login">
+
         <div id="login-alert" class="alert" style="display:none;"></div>
 
         <form id="login-form" novalidate>
@@ -43,24 +44,16 @@
         </form>
       </div>
 
-      <!-- SIGNUP PANEL -->
+      <!-- ================= SIGNUP ================= -->
       <div id="panel-signup" style="display:none;">
+
         <div id="signup-alert" class="alert" style="display:none;"></div>
 
         <form id="signup-form" novalidate>
-          <div class="field">
-            <label>I want to…</label>
-            <div class="role-picker">
-              <div class="role-option selected" data-role="customer">
-                Hire someone
-                <div class="small muted">Post jobs</div>
-              </div>
-              <div class="role-option" data-role="provider">
-                Find work
-                <div class="small muted">Send proposals</div>
-              </div>
-            </div>
-          </div>
+
+          <p class="small muted mb-4">
+            One account does everything — post jobs <strong>and</strong> send proposals.
+          </p>
 
           <div class="field">
             <label for="signup-name">Full name</label>
@@ -83,33 +76,37 @@
             <input id="signup-confirm" class="input" type="password" autocomplete="new-password" required />
           </div>
 
-          <!-- Provider-only fields -->
-          <div id="provider-extra" style="display:none;">
-            <div class="field">
-              <label for="signup-phone">Phone number</label>
-              <input id="signup-phone" class="input" type="tel" placeholder="e.g. 097 123 4567" />
-            </div>
+          <hr style="border:none; border-top:1px solid var(--line); margin: var(--sp-5) 0;" />
 
+          <p class="small muted mb-4">
+            <strong>Optional profile</strong> — helps customers and providers reach you.
+          </p>
+
+          <div class="grid grid-2">
+            <div class="field">
+              <label for="signup-phone">Phone</label>
+              <input id="signup-phone" class="input" type="tel" placeholder="097 123 4567" />
+            </div>
             <div class="field">
               <label for="signup-location">Location</label>
-              <input id="signup-location" class="input" type="text" placeholder="e.g. Lusaka" />
+              <input id="signup-location" class="input" type="text" placeholder="Lusaka" />
             </div>
+          </div>
 
-            <div class="field">
-              <label for="signup-skills">Skills / services</label>
-              <select id="signup-skills" class="select" multiple size="5"></select>
-              <div class="field-hint">Hold Ctrl (or Cmd) to pick more than one.</div>
-            </div>
+          <div class="field">
+            <label for="signup-skills">Skills / services offered</label>
+            <select id="signup-skills" class="select" multiple size="5"></select>
+            <div class="field-hint">Hold Ctrl (or Cmd) to pick more than one.</div>
+          </div>
 
-            <div class="field">
-              <label for="signup-experience">Experience</label>
-              <input id="signup-experience" class="input" type="text" placeholder="e.g. 5 years" />
-            </div>
+          <div class="field">
+            <label for="signup-experience">Experience</label>
+            <input id="signup-experience" class="input" type="text" placeholder="e.g. 5 years" />
+          </div>
 
-            <div class="field">
-              <label for="signup-bio">Short bio</label>
-              <textarea id="signup-bio" class="textarea" placeholder="Tell customers about your work…"></textarea>
-            </div>
+          <div class="field">
+            <label for="signup-bio">Short bio</label>
+            <textarea id="signup-bio" class="textarea" placeholder="Tell others about your work…"></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block">Create account</button>
