@@ -1,15 +1,17 @@
 // ============================================================
 // ZEDCLEANER — core/engine.js
-// Business logic: users, jobs, proposals.
-// Every user can post jobs AND send proposals.
+// Business logic on top of Firestore.
+// Every function that touches the DB is async.
 // ============================================================
 
-import { saveData, loadData } from "./storage.js";
+import {
+  addDocTo,
+  getAllDocs,
+  getDocById,
+  updateDocById,
+} from "./storage.js";
 
-const KEY_USERS     = "zedcleaner_users";
-const KEY_JOBS      = "zedcleaner_jobs";
-const KEY_PROPOSALS = "zedcleaner_proposals";
-
+// ---------- Constants ----------
 export const CATEGORIES = [
   "Cleaning",
   "Electrical",
@@ -38,32 +40,23 @@ export const PROPOSAL_STATUS = {
   REJECTED: "rejected",
 };
 
-// Only two roles now: regular user, and admin.
 export const ROLES = {
   USER:  "user",
   ADMIN: "admin",
 };
 
-function generateId(prefix = "id") {
-  return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-}
+const COL_USERS     = "users";
+const COL_JOBS      = "jobs";
+const COL_PROPOSALS = "proposals";
 
-function readUsers()  { return loadData(KEY_USERS, []); }
-function writeUsers(u){ saveData(KEY_USERS, u); }
-
-function readJobs()   { return loadData(KEY_JOBS, []); }
-function writeJobs(j) { saveData(KEY_JOBS, j); }
-
-function readProposals()  { return loadData(KEY_PROPOSALS, []); }
-function writeProposals(p){ saveData(KEY_PROPOSALS, p); }
-
-// ---------- Bootstrap: create admin if missing ----------
-export function bootstrap() {
-  const users = readUsers();
+// ============================================================
+// BOOTSTRAP — create admin if missing
+// ============================================================
+export async function bootstrap() {
+  const users = await getAllDocs(COL_USERS);
   const adminExists = users.some((u) => u.role === ROLES.ADMIN);
   if (!adminExists) {
-    const admin = {
-      id: generateId("user"),
+    await addDocTo(COL_USERS, {
       name: "ZEDCLEANER Admin",
       email: "admin@zedcleaner.com",
       password: "admin123",
@@ -74,25 +67,26 @@ export function bootstrap() {
       experience: "",
       bio: "",
       createdAt: new Date().toISOString(),
-    };
-    users.push(admin);
-    writeUsers(users);
+    });
     console.log("[engine] Admin created: admin@zedcleaner.com / admin123");
   }
 }
 
-// ---------- USERS ----------
-export function createUser({ name, email, password, phone = "", location = "", skills = [], experience = "", bio = "" }) {
+// ============================================================
+// USERS
+// ============================================================
+export async function createUser({ name, email, password, phone = "", location = "", skills = [], experience = "", bio = "" }) {
   if (!name || !email || !password) {
     return { ok: false, error: "Missing required fields." };
   }
-  const users = readUsers();
   const emailLower = email.trim().toLowerCase();
+
+  const users = await getAllDocs(COL_USERS);
   if (users.some((u) => u.email === emailLower)) {
     return { ok: false, error: "An account with that email already exists." };
   }
-  const user = {
-    id: generateId("user"),
+
+  const result = await addDocTo(COL_USERS, {
     name: name.trim(),
     email: emailLower,
     password,
@@ -103,89 +97,95 @@ export function createUser({ name, email, password, phone = "", location = "", s
     experience,
     bio,
     createdAt: new Date().toISOString(),
-  };
-  users.push(user);
-  writeUsers(users);
-  return { ok: true, user };
+  });
+
+  if (!result.ok) return result;
+  return { ok: true, user: result.data };
 }
 
-export function loginUser(email, password) {
-  const users = readUsers();
+export async function loginUser(email, password) {
   const emailLower = String(email || "").trim().toLowerCase();
+  const users = await getAllDocs(COL_USERS);
   const user = users.find((u) => u.email === emailLower && u.password === password);
   if (!user) return { ok: false, error: "Invalid email or password." };
   return { ok: true, user };
 }
 
-export function findUserById(id) {
-  return readUsers().find((u) => u.id === id) || null;
+export async function findUserById(id) {
+  if (!id) return null;
+  return await getDocById(COL_USERS, id);
 }
 
-export function getAllUsers() {
-  return readUsers();
+export async function getAllUsers() {
+  return await getAllDocs(COL_USERS);
 }
 
-export function updateUser(id, updates) {
-  const users = readUsers();
-  const idx = users.findIndex((u) => u.id === id);
-  if (idx === -1) return { ok: false, error: "User not found." };
+export async function updateUser(id, updates) {
   delete updates.id;
   delete updates.role;
-  users[idx] = { ...users[idx], ...updates };
-  writeUsers(users);
-  return { ok: true, user: users[idx] };
+  return await updateDocById(COL_USERS, id, updates);
 }
 
-// ---------- JOBS ----------
-export function createJob({ customerId, title, category, description, location, budget }) {
+// ============================================================
+// JOBS
+// ============================================================
+export async function createJob({ customerId, title, category, description, location, budget, images = [] }) {
   if (!customerId || !title || !category || !description) {
     return { ok: false, error: "Missing required job fields." };
   }
   if (!CATEGORIES.includes(category)) {
     return { ok: false, error: "Invalid category." };
   }
-  const jobs = readJobs();
-  const job = {
-    id: generateId("job"),
+
+  const result = await addDocTo(COL_JOBS, {
     customerId,
     title: title.trim(),
     category,
     description: description.trim(),
     location: (location || "").trim(),
     budget: budget || "",
+    images: Array.isArray(images) ? images : [],
     status: JOB_STATUS.OPEN,
     hiredProviderId: null,
     createdAt: new Date().toISOString(),
-  };
-  jobs.push(job);
-  writeJobs(jobs);
-  return { ok: true, job };
+  });
+
+  if (!result.ok) return result;
+  return { ok: true, job: result.data };
 }
 
-export function getAllJobs() { return readJobs(); }
-
-export function getOpenJobs() {
-  return readJobs().filter((j) => j.status === JOB_STATUS.OPEN);
+export async function getAllJobs() {
+  return await getAllDocs(COL_JOBS);
 }
 
-export function getJobsByCustomer(customerId) {
-  return readJobs().filter((j) => j.customerId === customerId);
+export async function getOpenJobs() {
+  const jobs = await getAllDocs(COL_JOBS);
+  return jobs.filter((j) => j.status === JOB_STATUS.OPEN);
 }
 
-export function findJobById(id) {
-  return readJobs().find((j) => j.id === id) || null;
+export async function getJobsByCustomer(customerId) {
+  const jobs = await getAllDocs(COL_JOBS);
+  return jobs.filter((j) => j.customerId === customerId);
 }
 
-export function getJobsByHiredProvider(providerId) {
-  return readJobs().filter((j) => j.hiredProviderId === providerId);
+export async function findJobById(id) {
+  if (!id) return null;
+  return await getDocById(COL_JOBS, id);
 }
 
-// ---------- PROPOSALS ----------
-export function submitProposal({ jobId, providerId, price, message }) {
+export async function getJobsByHiredProvider(providerId) {
+  const jobs = await getAllDocs(COL_JOBS);
+  return jobs.filter((j) => j.hiredProviderId === providerId);
+}
+
+// ============================================================
+// PROPOSALS
+// ============================================================
+export async function submitProposal({ jobId, providerId, price, message }) {
   if (!jobId || !providerId || !price) {
     return { ok: false, error: "Missing required proposal fields." };
   }
-  const job = findJobById(jobId);
+  const job = await findJobById(jobId);
   if (!job) return { ok: false, error: "Job not found." };
   if (job.status !== JOB_STATUS.OPEN) {
     return { ok: false, error: "This job is no longer open." };
@@ -194,69 +194,71 @@ export function submitProposal({ jobId, providerId, price, message }) {
     return { ok: false, error: "You cannot propose on your own job." };
   }
 
-  const proposals = readProposals();
+  const proposals = await getAllDocs(COL_PROPOSALS);
   if (proposals.some((p) => p.jobId === jobId && p.providerId === providerId)) {
     return { ok: false, error: "You have already proposed on this job." };
   }
 
-  const proposal = {
-    id: generateId("prop"),
+  const result = await addDocTo(COL_PROPOSALS, {
     jobId,
     providerId,
     price,
     message: (message || "").trim(),
     status: PROPOSAL_STATUS.PENDING,
     createdAt: new Date().toISOString(),
-  };
-  proposals.push(proposal);
-  writeProposals(proposals);
-  return { ok: true, proposal };
+  });
+
+  if (!result.ok) return result;
+  return { ok: true, proposal: result.data };
 }
 
-export function getProposalsByJob(jobId) {
-  return readProposals().filter((p) => p.jobId === jobId);
+export async function getProposalsByJob(jobId) {
+  const proposals = await getAllDocs(COL_PROPOSALS);
+  return proposals.filter((p) => p.jobId === jobId);
 }
 
-export function getProposalsByProvider(providerId) {
-  return readProposals().filter((p) => p.providerId === providerId);
+export async function getProposalsByProvider(providerId) {
+  const proposals = await getAllDocs(COL_PROPOSALS);
+  return proposals.filter((p) => p.providerId === providerId);
 }
 
-export function getAllProposals() { return readProposals(); }
+export async function getAllProposals() {
+  return await getAllDocs(COL_PROPOSALS);
+}
 
-export function acceptProposal(proposalId) {
-  const proposals = readProposals();
-  const target = proposals.find((p) => p.id === proposalId);
-  if (!target) return { ok: false, error: "Proposal not found." };
+export async function acceptProposal(proposalId) {
+  const proposal = await getDocById(COL_PROPOSALS, proposalId);
+  if (!proposal) return { ok: false, error: "Proposal not found." };
 
-  const jobs = readJobs();
-  const jobIdx = jobs.findIndex((j) => j.id === target.jobId);
-  if (jobIdx === -1) return { ok: false, error: "Job not found." };
-  if (jobs[jobIdx].status !== JOB_STATUS.OPEN) {
+  const job = await findJobById(proposal.jobId);
+  if (!job) return { ok: false, error: "Job not found." };
+  if (job.status !== JOB_STATUS.OPEN) {
     return { ok: false, error: "Job is no longer open." };
   }
 
-  const updated = proposals.map((p) => {
-    if (p.jobId !== target.jobId) return p;
-    if (p.id === proposalId) return { ...p, status: PROPOSAL_STATUS.ACCEPTED };
-    return { ...p, status: PROPOSAL_STATUS.REJECTED };
+  const allProposals = await getAllDocs(COL_PROPOSALS);
+  const siblings = allProposals.filter((p) => p.jobId === proposal.jobId);
+
+  // Update every sibling proposal
+  for (const p of siblings) {
+    const newStatus =
+      p.id === proposalId ? PROPOSAL_STATUS.ACCEPTED : PROPOSAL_STATUS.REJECTED;
+    await updateDocById(COL_PROPOSALS, p.id, { status: newStatus });
+  }
+
+  // Mark the job hired
+  await updateDocById(COL_JOBS, job.id, {
+    status: JOB_STATUS.HIRED,
+    hiredProviderId: proposal.providerId,
   });
 
-  jobs[jobIdx] = {
-    ...jobs[jobIdx],
-    status: JOB_STATUS.HIRED,
-    hiredProviderId: target.providerId,
-  };
-
-  writeProposals(updated);
-  writeJobs(jobs);
   return { ok: true };
 }
 
-export function rejectProposal(proposalId) {
-  const proposals = readProposals();
-  const idx = proposals.findIndex((p) => p.id === proposalId);
-  if (idx === -1) return { ok: false, error: "Proposal not found." };
-  proposals[idx] = { ...proposals[idx], status: PROPOSAL_STATUS.REJECTED };
-  writeProposals(proposals);
-  return { ok: true };
+export async function rejectProposal(proposalId) {
+  const proposal = await getDocById(COL_PROPOSALS, proposalId);
+  if (!proposal) return { ok: false, error: "Proposal not found." };
+  return await updateDocById(COL_PROPOSALS, proposalId, {
+    status: PROPOSAL_STATUS.REJECTED,
+  });
 }
