@@ -1,6 +1,7 @@
 // ============================================================
 // ZEDCLEANER — core/engine.js
-// Business logic: users, jobs, proposals, categories, statuses.
+// Business logic: users, jobs, proposals.
+// Every user can post jobs AND send proposals.
 // ============================================================
 
 import { saveData, loadData } from "./storage.js";
@@ -37,10 +38,10 @@ export const PROPOSAL_STATUS = {
   REJECTED: "rejected",
 };
 
+// Only two roles now: regular user, and admin.
 export const ROLES = {
-  CUSTOMER: "customer",
-  PROVIDER: "provider",
-  ADMIN:    "admin",
+  USER:  "user",
+  ADMIN: "admin",
 };
 
 function generateId(prefix = "id") {
@@ -56,6 +57,7 @@ function writeJobs(j) { saveData(KEY_JOBS, j); }
 function readProposals()  { return loadData(KEY_PROPOSALS, []); }
 function writeProposals(p){ saveData(KEY_PROPOSALS, p); }
 
+// ---------- Bootstrap: create admin if missing ----------
 export function bootstrap() {
   const users = readUsers();
   const adminExists = users.some((u) => u.role === ROLES.ADMIN);
@@ -66,6 +68,11 @@ export function bootstrap() {
       email: "admin@zedcleaner.com",
       password: "admin123",
       role: ROLES.ADMIN,
+      phone: "",
+      location: "",
+      skills: [],
+      experience: "",
+      bio: "",
       createdAt: new Date().toISOString(),
     };
     users.push(admin);
@@ -75,12 +82,9 @@ export function bootstrap() {
 }
 
 // ---------- USERS ----------
-export function createUser({ name, email, password, role, phone = "", location = "", skills = [], experience = "", bio = "" }) {
-  if (!name || !email || !password || !role) {
+export function createUser({ name, email, password, phone = "", location = "", skills = [], experience = "", bio = "" }) {
+  if (!name || !email || !password) {
     return { ok: false, error: "Missing required fields." };
-  }
-  if (role !== ROLES.CUSTOMER && role !== ROLES.PROVIDER) {
-    return { ok: false, error: "Invalid role for signup." };
   }
   const users = readUsers();
   const emailLower = email.trim().toLowerCase();
@@ -92,12 +96,12 @@ export function createUser({ name, email, password, role, phone = "", location =
     name: name.trim(),
     email: emailLower,
     password,
-    role,
+    role: ROLES.USER,
     phone,
     location,
-    skills: role === ROLES.PROVIDER ? skills : [],
-    experience: role === ROLES.PROVIDER ? experience : "",
-    bio: role === ROLES.PROVIDER ? bio : "",
+    skills: Array.isArray(skills) ? skills : [],
+    experience,
+    bio,
     createdAt: new Date().toISOString(),
   };
   users.push(user);
@@ -159,9 +163,19 @@ export function createJob({ customerId, title, category, description, location, 
 }
 
 export function getAllJobs() { return readJobs(); }
-export function getOpenJobs() { return readJobs().filter((j) => j.status === JOB_STATUS.OPEN); }
-export function getJobsByCustomer(customerId) { return readJobs().filter((j) => j.customerId === customerId); }
-export function findJobById(id) { return readJobs().find((j) => j.id === id) || null; }
+
+export function getOpenJobs() {
+  return readJobs().filter((j) => j.status === JOB_STATUS.OPEN);
+}
+
+export function getJobsByCustomer(customerId) {
+  return readJobs().filter((j) => j.customerId === customerId);
+}
+
+export function findJobById(id) {
+  return readJobs().find((j) => j.id === id) || null;
+}
+
 export function getJobsByHiredProvider(providerId) {
   return readJobs().filter((j) => j.hiredProviderId === providerId);
 }
@@ -173,12 +187,18 @@ export function submitProposal({ jobId, providerId, price, message }) {
   }
   const job = findJobById(jobId);
   if (!job) return { ok: false, error: "Job not found." };
-  if (job.status !== JOB_STATUS.OPEN) return { ok: false, error: "This job is no longer open." };
+  if (job.status !== JOB_STATUS.OPEN) {
+    return { ok: false, error: "This job is no longer open." };
+  }
+  if (job.customerId === providerId) {
+    return { ok: false, error: "You cannot propose on your own job." };
+  }
 
   const proposals = readProposals();
   if (proposals.some((p) => p.jobId === jobId && p.providerId === providerId)) {
     return { ok: false, error: "You have already proposed on this job." };
   }
+
   const proposal = {
     id: generateId("prop"),
     jobId,
@@ -196,9 +216,11 @@ export function submitProposal({ jobId, providerId, price, message }) {
 export function getProposalsByJob(jobId) {
   return readProposals().filter((p) => p.jobId === jobId);
 }
+
 export function getProposalsByProvider(providerId) {
   return readProposals().filter((p) => p.providerId === providerId);
 }
+
 export function getAllProposals() { return readProposals(); }
 
 export function acceptProposal(proposalId) {
@@ -212,12 +234,19 @@ export function acceptProposal(proposalId) {
   if (jobs[jobIdx].status !== JOB_STATUS.OPEN) {
     return { ok: false, error: "Job is no longer open." };
   }
+
   const updated = proposals.map((p) => {
     if (p.jobId !== target.jobId) return p;
     if (p.id === proposalId) return { ...p, status: PROPOSAL_STATUS.ACCEPTED };
     return { ...p, status: PROPOSAL_STATUS.REJECTED };
   });
-  jobs[jobIdx] = { ...jobs[jobIdx], status: JOB_STATUS.HIRED, hiredProviderId: target.providerId };
+
+  jobs[jobIdx] = {
+    ...jobs[jobIdx],
+    status: JOB_STATUS.HIRED,
+    hiredProviderId: target.providerId,
+  };
+
   writeProposals(updated);
   writeJobs(jobs);
   return { ok: true };
