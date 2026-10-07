@@ -1,7 +1,7 @@
 // ============================================================
 // ZEDCLEANER — core/session.js
 // Login state + page guard.
-// All non-admin users share role "user".
+// Session ID stays in localStorage (device-level concept).
 // ============================================================
 
 import { saveData, loadData, removeData } from "./storage.js";
@@ -9,28 +9,53 @@ import { findUserById, ROLES } from "./engine.js";
 
 const KEY_SESSION = "zedcleaner_session";
 
-export function setSession(user) {
-  if (!user || !user.id) return false;
-  return saveData(KEY_SESSION, { userId: user.id });
+// ---------- Local session persistence (uses a tiny inline helper) ----------
+// Note: we can't use the Firestore-based storage.js for this — it doesn't
+// export saveData/loadData/removeData anymore. So we inline localStorage here.
+function saveSessionData(data) {
+  try { localStorage.setItem(KEY_SESSION, JSON.stringify(data)); return true; }
+  catch { return false; }
+}
+function loadSessionData() {
+  try {
+    const s = localStorage.getItem(KEY_SESSION);
+    return s ? JSON.parse(s) : null;
+  } catch { return null; }
+}
+function removeSessionData() {
+  try { localStorage.removeItem(KEY_SESSION); return true; }
+  catch { return false; }
 }
 
-export function getCurrentUser() {
-  const session = loadData(KEY_SESSION, null);
+// ---------- Session API ----------
+
+export function setSession(user) {
+  if (!user || !user.id) return false;
+  return saveSessionData({ userId: user.id });
+}
+
+/**
+ * Return the full user object of whoever is logged in.
+ * Async — because it fetches the user from Firestore.
+ */
+export async function getCurrentUser() {
+  const session = loadSessionData();
   if (!session || !session.userId) return null;
-  return findUserById(session.userId);
+  return await findUserById(session.userId);
 }
 
 export function clearSession() {
-  return removeData(KEY_SESSION);
+  return removeSessionData();
 }
 
 /**
  * Guard a protected page.
- * By default, any logged-in user passes.
- * Pass ROLES.ADMIN only for admin-only pages.
+ * Any logged-in user passes. Pass ROLES.ADMIN for admin-only pages.
+ *
+ * Async — because it awaits getCurrentUser().
  */
-export function requireAuth(requiredRole = null) {
-  const user = getCurrentUser();
+export async function requireAuth(requiredRole = null) {
+  const user = await getCurrentUser();
   if (!user) {
     window.location.href = "../auth.html";
     return null;
@@ -42,10 +67,6 @@ export function requireAuth(requiredRole = null) {
   return user;
 }
 
-/**
- * Relative path to a user's dashboard from within a subfolder.
- * Now everyone goes to /dashboard.html (top-level).
- */
 function dashboardPathFor(role) {
   if (role === ROLES.ADMIN) return "../admin/dashboard.html";
   return "../dashboard.html";
