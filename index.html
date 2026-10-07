@@ -6,7 +6,6 @@
   <title>ZEDCLEANER — Get the job done.</title>
   <meta name="description" content="ZEDCLEANER is a service marketplace for Zambia. Post a job, receive proposals, hire the right person." />
 
-  <!-- The ONLY stylesheet in the project -->
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 <body>
@@ -34,9 +33,10 @@
         <strong style="color: var(--blue-600);">Get the job done.</strong>
       </p>
       <div class="flex" style="justify-content: center; flex-wrap: wrap;">
-        <a href="auth.html" class="btn btn-primary">Post a job</a>
-        <a href="auth.html" class="btn btn-outline">Find work</a>
+        <a href="auth.html" class="btn btn-primary">Get started</a>
+        <a href="#how" class="btn btn-outline">How it works</a>
       </div>
+      <p class="small muted mt-4">One free account does both — post jobs and send proposals.</p>
     </div>
   </section>
 
@@ -45,28 +45,30 @@
     <div class="container">
       <h2 class="center mb-4">How it works</h2>
 
-      <div class="grid grid-2">
+      <div class="grid grid-3">
 
-        <!-- Customer flow -->
         <div class="card">
-          <h3>For customers</h3>
-          <p class="muted small">Hire someone in three steps.</p>
-          <ol style="padding-left: var(--sp-5); color: var(--ink-700);">
-            <li class="mb-2"><strong>Post your job.</strong> Describe what you need, where, and your budget.</li>
-            <li class="mb-2"><strong>Receive proposals.</strong> Providers send you their price and a short message.</li>
-            <li><strong>Hire the best one.</strong> Accept a proposal — the job is theirs.</li>
-          </ol>
+          <h3>1. Create your account</h3>
+          <p class="muted small">
+            One free account gives you full access. No need to pick a side —
+            you can post jobs and send proposals at the same time.
+          </p>
         </div>
 
-        <!-- Provider flow -->
         <div class="card">
-          <h3>For providers</h3>
-          <p class="muted small">Find work in three steps.</p>
-          <ol style="padding-left: var(--sp-5); color: var(--ink-700);">
-            <li class="mb-2"><strong>Browse open jobs.</strong> Filter by category that matches your skills.</li>
-            <li class="mb-2"><strong>Send a proposal.</strong> Set your price and a short message to the customer.</li>
-            <li><strong>Get hired.</strong> If the customer accepts, you see the job on your dashboard.</li>
-          </ol>
+          <h3>2. Post a job or browse</h3>
+          <p class="muted small">
+            Need something done? Post a job in seconds. Looking for work?
+            Browse the marketplace and filter by category.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>3. Send proposals & hire</h3>
+          <p class="muted small">
+            Providers send proposals with a price and message. Job posters
+            review them and accept the best one.
+          </p>
         </div>
 
       </div>
@@ -116,8 +118,6 @@
     </div>
   </footer>
 
-  <!-- Tiny inline script — sets the year in the footer.
-       This is the ONLY JS on this page, and it's harmless. -->
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
