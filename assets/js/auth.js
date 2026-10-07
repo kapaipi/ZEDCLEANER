@@ -1,6 +1,6 @@
 // ============================================================
 // ZEDCLEANER — assets/js/auth.js
-// Page logic for auth.html.
+// Signup + login. No role picker — every account is universal.
 // ============================================================
 
 import {
@@ -15,23 +15,24 @@ import { setSession, getCurrentUser } from "../../core/session.js";
 
 bootstrap();
 
+// Redirect if already logged in
 const existing = getCurrentUser();
 if (existing) {
   window.location.href = dashboardPathFor(existing.role);
 }
 
-const tabLogin      = document.getElementById("tab-login");
-const tabSignup     = document.getElementById("tab-signup");
-const panelLogin    = document.getElementById("panel-login");
-const panelSignup   = document.getElementById("panel-signup");
-const loginForm     = document.getElementById("login-form");
-const signupForm    = document.getElementById("signup-form");
-const loginAlert    = document.getElementById("login-alert");
-const signupAlert   = document.getElementById("signup-alert");
-const roleOptions   = document.querySelectorAll(".role-option");
-const providerExtra = document.getElementById("provider-extra");
-const skillsSelect  = document.getElementById("signup-skills");
+// ---------- DOM ----------
+const tabLogin    = document.getElementById("tab-login");
+const tabSignup   = document.getElementById("tab-signup");
+const panelLogin  = document.getElementById("panel-login");
+const panelSignup = document.getElementById("panel-signup");
+const loginForm   = document.getElementById("login-form");
+const signupForm  = document.getElementById("signup-form");
+const loginAlert  = document.getElementById("login-alert");
+const signupAlert = document.getElementById("signup-alert");
+const skillsSelect = document.getElementById("signup-skills");
 
+// Populate skills dropdown
 if (skillsSelect) {
   CATEGORIES.forEach((cat) => {
     const opt = document.createElement("option");
@@ -41,6 +42,7 @@ if (skillsSelect) {
   });
 }
 
+// ---------- Tabs ----------
 function showTab(which) {
   const isLogin = which === "login";
   tabLogin.classList.toggle("active", isLogin);
@@ -54,19 +56,7 @@ tabLogin.addEventListener("click",  () => showTab("login"));
 tabSignup.addEventListener("click", () => showTab("signup"));
 showTab("login");
 
-let selectedRole = ROLES.CUSTOMER;
-roleOptions.forEach((el) => {
-  el.addEventListener("click", () => {
-    roleOptions.forEach((o) => o.classList.remove("selected"));
-    el.classList.add("selected");
-    selectedRole = el.dataset.role;
-    if (providerExtra) {
-      providerExtra.style.display =
-        selectedRole === ROLES.PROVIDER ? "block" : "none";
-    }
-  });
-});
-
+// ---------- Alerts ----------
 function showAlert(el, message, type = "error") {
   if (!el) return;
   el.textContent = message;
@@ -79,6 +69,7 @@ function clearAlert(el) {
   el.style.display = "none";
 }
 
+// ---------- Signup ----------
 signupForm.addEventListener("submit", (e) => {
   e.preventDefault();
   clearAlert(signupAlert);
@@ -87,9 +78,16 @@ signupForm.addEventListener("submit", (e) => {
   const email    = document.getElementById("signup-email").value.trim();
   const password = document.getElementById("signup-password").value;
   const confirm  = document.getElementById("signup-confirm").value;
+  const phone    = document.getElementById("signup-phone")?.value.trim() || "";
+  const location = document.getElementById("signup-location")?.value.trim() || "";
+  const experience = document.getElementById("signup-experience")?.value.trim() || "";
+  const bio      = document.getElementById("signup-bio")?.value.trim() || "";
+  const skills   = skillsSelect
+    ? Array.from(skillsSelect.selectedOptions).map((o) => o.value)
+    : [];
 
   if (!name || !email || !password) {
-    return showAlert(signupAlert, "Please fill in all required fields.");
+    return showAlert(signupAlert, "Please fill in name, email, and password.");
   }
   if (password.length < 6) {
     return showAlert(signupAlert, "Password must be at least 6 characters.");
@@ -98,23 +96,8 @@ signupForm.addEventListener("submit", (e) => {
     return showAlert(signupAlert, "Passwords do not match.");
   }
 
-  let phone = "", location = "", experience = "", bio = "", skills = [];
-  if (selectedRole === ROLES.PROVIDER) {
-    phone      = document.getElementById("signup-phone")?.value.trim()    || "";
-    location   = document.getElementById("signup-location")?.value.trim() || "";
-    experience = document.getElementById("signup-experience")?.value.trim() || "";
-    bio        = document.getElementById("signup-bio")?.value.trim()      || "";
-    if (skillsSelect) {
-      skills = Array.from(skillsSelect.selectedOptions).map((o) => o.value);
-    }
-    if (!phone || !location) {
-      return showAlert(signupAlert, "Providers must add a phone number and location.");
-    }
-  }
-
   const result = createUser({
     name, email, password,
-    role: selectedRole,
     phone, location, skills, experience, bio,
   });
 
@@ -129,6 +112,7 @@ signupForm.addEventListener("submit", (e) => {
   }, 500);
 });
 
+// ---------- Login ----------
 loginForm.addEventListener("submit", (e) => {
   e.preventDefault();
   clearAlert(loginAlert);
@@ -152,9 +136,8 @@ loginForm.addEventListener("submit", (e) => {
   }, 400);
 });
 
+// ---------- Dashboard path ----------
 function dashboardPathFor(role) {
-  if (role === ROLES.CUSTOMER) return "customer/dashboard.html";
-  if (role === ROLES.PROVIDER) return "provider/dashboard.html";
-  if (role === ROLES.ADMIN)    return "admin/dashboard.html";
-  return "auth.html";
+  if (role === ROLES.ADMIN) return "admin/dashboard.html";
+  return "dashboard.html";
 }
