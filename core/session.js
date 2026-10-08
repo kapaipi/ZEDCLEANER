@@ -4,14 +4,13 @@
 // Session ID stays in localStorage (device-level concept).
 // ============================================================
 
-import { saveData, loadData, removeData } from "./storage.js";
 import { findUserById, ROLES } from "./engine.js";
 
 const KEY_SESSION = "zedcleaner_session";
 
-// ---------- Local session persistence (uses a tiny inline helper) ----------
-// Note: we can't use the Firestore-based storage.js for this — it doesn't
-// export saveData/loadData/removeData anymore. So we inline localStorage here.
+// ---------- Local session persistence ----------
+// We do NOT use Firestore for the session — it's per-device by nature,
+// so localStorage is the right tool here.
 function saveSessionData(data) {
   try { localStorage.setItem(KEY_SESSION, JSON.stringify(data)); return true; }
   catch { return false; }
@@ -36,7 +35,7 @@ export function setSession(user) {
 
 /**
  * Return the full user object of whoever is logged in.
- * Async — because it fetches the user from Firestore.
+ * Async — fetches from Firestore.
  */
 export async function getCurrentUser() {
   const session = loadSessionData();
@@ -51,8 +50,6 @@ export function clearSession() {
 /**
  * Guard a protected page.
  * Any logged-in user passes. Pass ROLES.ADMIN for admin-only pages.
- *
- * Async — because it awaits getCurrentUser().
  */
 export async function requireAuth(requiredRole = null) {
   const user = await getCurrentUser();
